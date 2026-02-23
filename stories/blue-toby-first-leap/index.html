@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blue Toby's First Leap | Tadpole Academy</title>
+    <style>
+        :root {
+            --water: #e0f7fa;
+            --deep-water: #006064;
+            --lily: #81c784;
+            --lotus: #f06292;
+            --toby: #29b6f6;
+            --sun: #ffd54f;
+            --font: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(180deg, #87ceeb 0%, #e0f7fa 100%);
+            font-family: var(--font);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--deep-water);
+            overflow-x: hidden;
+        }
+
+        h1 { 
+            margin: 20px 10px 10px; 
+            font-size: 1.8em; 
+            text-align: center;
+            text-shadow: 1px 1px 0 #fff;
+        }
+
+        p { 
+            font-size: 1.1em; 
+            max-width: 600px; 
+            text-align: center; 
+            line-height: 1.6; 
+            margin: 10px 20px;
+            background: rgba(255,255,255,0.7);
+            padding: 15px;
+            border-radius: 15px;
+        }
+
+        /* The Pond */
+        #pond {
+            position: relative;
+            width: 90%;
+            max-width: 400px;
+            height: 350px;
+            background: linear-gradient(180deg, #81d4fa 0%, #4fc3f7 50%, #29b6f6 100%);
+            border-radius: 50% 50% 45% 45%;
+            border: 6px solid #0288d1;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15), inset 0 -10px 30px rgba(0,100,150,0.1);
+            overflow: hidden;
+            margin: 10px auto;
+        }
+
+        /* Lily Pads */
+        .lily {
+            position: absolute;
+            font-size: 50px;
+            cursor: pointer;
+            transition: all 0.5s ease;
+            filter: drop-shadow(2px 4px 0 rgba(0,0,0,0.1));
+            z-index: 1;
+        }
+
+        .lily:hover { transform: scale(1.1); }
+        .lily.visited { filter: brightness(1.2) drop-shadow(2px 4px 0 rgba(0,0,0,0.1)); }
+
+        #pad-start { bottom: 30px; left: 30px; }
+        #pad-1 { bottom: 80px; left: 120px; }
+        #pad-2 { bottom: 150px; left: 80px; }
+        #pad-3 { bottom: 200px; left: 180px; }
+        #pad-far { bottom: 220px; right: 30px; }
+
+        /* Toby */
+        #toby {
+            position: absolute;
+            font-size: 40px;
+            bottom: 35px;
+            left: 35px;
+            z-index: 10;
+            transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            filter: drop-shadow(2px 4px 0 rgba(0,0,0,0.2));
+        }
+
+        /* Sun */
+        #sun {
+            position: absolute;
+            top: -30px;
+            right: -20px;
+            font-size: 80px;
+            animation: rise 1s ease-out;
+        }
+
+        @keyframes rise {
+            from { transform: translateY(100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Secrets */
+        .secret {
+            position: absolute;
+            font-size: 24px;
+            opacity: 0;
+            transition: opacity 1s;
+        }
+
+        .secret.revealed { opacity: 1; animation: sparkle 1s ease-out; }
+
+        @keyframes sparkle {
+            0% { transform: scale(0) rotate(0deg); }
+            50% { transform: scale(1.3) rotate(180deg); }
+            100% { transform: scale(1) rotate(360deg); }
+        }
+
+        /* Controls */
+        .btn-group {
+            margin: 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        button {
+            padding: 12px 25px;
+            font-size: 1em;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: var(--font);
+            font-weight: bold;
+            transition: all 0.2s;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.15);
+        }
+
+        button:active { transform: translateY(4px); box-shadow: none; }
+
+        #btn-hint { background: #fff9c4; color: #f57f17; }
+        #btn-leap { background: #b3e5fc; color: #0277bd; }
+        #btn-reset { background: #ffccbc; color: #d84315; }
+
+        /* Message */
+        #message {
+            min-height: 60px;
+            font-size: 1.1em;
+            color: #01579b;
+            font-weight: bold;
+            margin: 10px;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.8);
+            border-radius: 20px;
+        }
+
+        .hidden { display: none !important; }
+
+    </style>
+</head>
+<body>
+
+    <h1>🐸 Blue Toby's First Leap</h1>
+
+    <p id="story">"How will I ever reach that far lily pad?" asked Toby.<br>Grandpa Frog smiled: <em>"First, find the pad that's just one hop away."</em></p>
+
+    <div id="pond">
+        <div id="sun">☀️</div>
+        
+        <!-- Lily Pads - clickable -->
+        <div class="lily" id="pad-start" onclick="hopTo('pad-start')">🪷</div>
+        <div class="lily" id="pad-1" onclick="hopTo('pad-1')">🪷</div>
+        <div class="lily" id="pad-2" onclick="hopTo('pad-2')">🪷</div>
+        <div class="lily" id="pad-3" onclick="hopTo('pad-3')">🪷</div>
+        <div class="lily" id="pad-far" onclick="hopTo('pad-far')">🪷</div>
+        
+        <!-- Toby -->
+        <div id="toby">🐸</div>
+        
+        <!-- Secrets (appear when reaching each pad) -->
+        <div class="secret" id="secret-1" style="bottom: 90px; left: 140px;">💭</div>
+        <div class="secret" id="secret-2" style="bottom: 160px; left: 100px;">🌱</div>
+        <div class="secret" id="secret-3" style="bottom: 210px; left: 200px;">✨</div>
+        <div class="secret" id="secret-far" style="bottom: 230px; right: 50px;">🌟</div>
+    </div>
+
+    <div id="message">Click on the lily pad closest to Toby to make your first hop!</div>
+
+    <div class="btn-group">
+        <button id="btn-hint" onclick="showHint()">💡 Hint</button>
+        <button id="btn-leap" onclick="bigLeap()" class="hidden">Leap Far! 🦘</button>
+        <button id="btn-reset" onclick="resetGame()">🔄 Start Over</button>
+    </div>
+
+    <script>
+        const toby = document.getElementById('toby');
+        const message = document.getElementById('message');
+        const story = document.getElementById('story');
+        const btnLeap = document.getElementById('btn-leap');
+        const btnHint = document.getElementById('btn-hint');
+        
+        const pads = {
+            'pad-start': { x: 35, y: -5, next: 'pad-1' },
+            'pad-1': { x: 125, y: -50, next: 'pad-2' },
+            'pad-2': { x: 85, y: -120, next: 'pad-3' },
+            'pad-3': { x: 185, y: -170, next: 'pad-far' },
+            'pad-far': { x: 280, y: -190, next: null }
+        };
+
+        let currentPad = 'pad-start';
+        let hopCount = 0;
+        let reachedPads = new Set(['pad-start']);
+
+        function hopTo(padId) {
+            const target = pads[padId];
+            const current = pads[currentPad];
+            
+            // Can only hop to the next pad (or start)
+            if (padId !== currentPad && padId !== current.next && padId !== 'pad-start') {
+                message.innerText = "👀 One hop at a time! Find the next lily pad.";
+                return;
+            }
+            
+            // Move Toby
+            toby.style.transform = `translate(${target.x - 35}px, ${target.y + 5}px)`;
+            
+            // Mark as visited
+            document.getElementById(padId).classList.add('visited');
+            reachedPads.add(padId);
+            
+            // Reveal secret
+            const secretMap = { 'pad-1': 'secret-1', 'pad-2': 'secret-2', 'pad-3': 'secret-3', 'pad-far': 'secret-far' };
+            if (secretMap[padId]) {
+                document.getElementById(secretMap[padId]).classList.add('revealed');
+            }
+            
+            currentPad = padId;
+            hopCount++;
+            
+            // Messages based on progress
+            const messages = {
+                'pad-start': "Toby is ready. Make your first hop!",
+                'pad-1': "Good hop! The pond is carrying you. One more!",
+                'pad-2': "You're doing great! Almost there...",
+                'pad-3': "Just one more hop to the far lily pad!",
+                'pad-far': "🎉 You made it!"
+            };
+            
+            message.innerText = messages[padId];
+            
+            // Show leap button when close
+            if (padId === 'pad-3') {
+                btnLeap.classList.remove('hidden');
+            }
+            
+            // Win condition
+            if (padId === 'pad-far') {
+                winGame();
+            }
+            
+            currentPad = padId;
+        }
+
+        function bigLeap() {
+            hopTo('pad-far');
+        }
+
+        function showHint() {
+            const hints = {
+                'pad-start': "Click on the lily pad that's just a little farther away 🪷",
+                'pad-1': "Look for the next pad — not too far, not too close 🪷",
+                'pad-2': "You're getting closer! Keep going! 🪷",
+                'pad-3': "One more hop to the far pad — or try a BIG LEAP! 🦘",
+                'pad-far': "You made it! 🎉"
+            };
+            message.innerText = hints[currentPad];
+        }
+
+        function winGame() {
+            story.innerHTML = "<b>🎉 You did it!</b><br>By sunset, Toby reached the far lily pad.<br>He looked back and smiled. It didn't seem so far anymore.";
+            message.innerText = "The lily pads whisper: 'One hop, one leaf... the pond will guide you.' 🌟";
+            btnHint.classList.add('hidden');
+            document.getElementById('btn-leap').classList.add('hidden');
+            
+            // Celebration
+            setTimeout(() => {
+                toby.innerText = "🐸✨";
+            }, 500);
+        }
+
+        function resetGame() {
+            currentPad = 'pad-start';
+            hopCount = 0;
+            reachedPads.clear();
+            reachedPads.add('pad-start');
+            
+            toby.style.transform = 'none';
+            toby.innerText = '🐸';
+            
+            document.querySelectorAll('.lily').forEach(pad => pad.classList.remove('visited'));
+            document.querySelectorAll('.secret').forEach(s => s.classList.remove('revealed'));
+            
+            story.innerHTML = '"How will I ever reach that far lily pad?" asked Toby.<br>Grandpa Frog smiled: <em>"First, find the pad that\'s just one hop away."</em>';
+            message.innerText = "Click on the lily pad closest to Toby to make your first hop!";
+            btnLeap.classList.add('hidden');
+            btnHint.classList.remove('hidden');
+        }
+    </script>
+
+</body>
+</html>
