@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blue Toby's Adventure | Tadpole Academy</title>
+    <style>
+        :root {
+            --water: #e0f7fa;
+            --deep-water: #006064;
+            --lily: #81c784;
+            --lotus: #f06292;
+            --toby: #29b6f6;
+            --sun: #ffd54f;
+            --font: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(180deg, #87ceeb 0%, #e0f7fa 100%);
+            font-family: var(--font);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--deep-water);
+        }
+
+        h1 {
+            margin: 20px 10px 10px;
+            font-size: 1.8em;
+            text-shadow: 2px 2px 0 #fff;
+        }
+
+        #story-container {
+            width: 90%;
+            max-width: 500px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 25px;
+            padding: 25px;
+            margin: 15px auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        #scene-image {
+            font-size: 80px;
+            text-align: center;
+            margin: 20px 0;
+            animation: float 3s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        #story-text {
+            font-size: 1.2em;
+            line-height: 1.8;
+            text-align: center;
+            margin: 20px 0;
+            color: #333;
+        }
+
+        #choices {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .choice-btn {
+            padding: 15px 20px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-family: var(--font);
+            transition: all 0.2s;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.1);
+            text-align: left;
+        }
+
+        .choice-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 rgba(0,0,0,0.1);
+        }
+
+        .choice-btn:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        .choice-btn.be-brave { background: #ffe082; color: #f57f17; }
+        .choice-btn.be-careful { background: #b3e5fc; color: #0277bd; }
+        .choice-btn.be-kind { background: #f8bbd0; color: #c2185b; }
+        .choice-btn.be-still { background: #c8e6c9; color: #2e7d32; }
+
+        #restart-btn {
+            display: none;
+            margin: 20px auto;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            background: #81c784;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: var(--font);
+            font-weight: bold;
+            box-shadow: 0 4px 0 #388e3c;
+        }
+
+        #restart-btn:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        #lesson {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+            padding: 20px;
+            background: #e8f5e9;
+            border-radius: 15px;
+            border-left: 5px solid #4caf50;
+        }
+
+        #lesson h3 {
+            margin: 0 0 10px;
+            color: #2e7d32;
+        }
+
+        .progress-dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin: 15px 0;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ccc;
+        }
+
+        .dot.active { background: #4caf50; }
+        .dot.done { background: #81c784; }
+
+    </style>
+</head>
+<body>
+
+    <h1>🐸 Blue Toby's Adventure</h1>
+    <p style="margin: 5px; color: #666;">A story where YOU choose what happens next!</p>
+
+    <div class="progress-dots">
+        <div class="dot active" id="dot1"></div>
+        <div class="dot" id="dot2"></div>
+        <div class="dot" id="dot3"></div>
+        <div class="dot" id="dot4"></div>
+    </div>
+
+    <div id="story-container">
+        <div id="scene-image">🐸</div>
+        <div id="story-text">
+            One sunny morning, Blue Toby woke up and looked at the pond. 
+            The water was sparkling, and the lily pads were dancing.
+            <br><br>
+            "What should I do today?" asked Toby.
+        </div>
+        <div id="choices">
+            <button class="choice-btn be-brave" onclick="choose(1)">
+                🦸 Explore the far side of the pond!
+            </button>
+            <button class="choice-btn be-careful" onclick="choose(2)">
+                🌸 Help Grandpa Frog find his glasses
+            </button>
+            <button class="choice-btn be-kind" onclick="choose(3)">
+                🐢 Play with the new tadpole
+            </button>
+        </div>
+    </div>
+
+    <button id="restart-btn" onclick="restart()">🔄 Play Again</button>
+
+    <div id="lesson">
+        <h3>💚 The Lesson</h3>
+        <p id="lesson-text"></p>
+    </div>
+
+    <script>
+        // Story branches
+        const stories = {
+            start: {
+                scene: '🐸',
+                text: `One sunny morning, Blue Toby woke up and looked at the pond. 
+                The water was sparkling, and the lily pads were dancing.
+                <br><br>
+                "What should I do today?" asked Toby.`,
+                choices: [
+                    { text: '🦸 Explore the far side of the pond!', next: 'explore', style: 'be-brave' },
+                    { text: '🌸 Help Grandpa Frog find his glasses', next: 'help', style: 'be-kind' },
+                    { text: '🐢 Play with the new tadpole', next: 'play', style: 'be-careful' }
+                ]
+            },
+            explore: {
+                scene: '🌊',
+                text: `Toby hopped far across the pond. The water got deeper, 
+                and the lily pads grew bigger. Suddenly, he heard a splash!
+                <br><br>
+                "What was that?" Toby wondered.`,
+                choices: [
+                    { text: '🦸 Investigate the sound!', next: 'investigate', style: 'be-brave' },
+                    { text: '🏃 Swim back to safety', next: 'safe', style: 'be-careful' }
+                ]
+            },
+            help: {
+                scene: '👓',
+                text: `Toby found Grandpa Frog sitting sadly on his lily pad.
+                "I can't find my glasses anywhere!" said Grandpa.
+                <br><br>
+                Toby looked around. Where should he search?`,
+                choices: [
+                    { text: '🔍 Under the big lotus flower', next: 'found', style: 'be-brave' },
+                    { text: '🔍 Near the old log', next: 'wrong', style: 'be-careful' }
+                ]
+            },
+            play: {
+                scene: '🐣',
+                text: `Toby met a little tadpole who was all alone.
+                "I don't have any friends," said the tadpole.
+                <br><br>
+                What should Toby do?`,
+                choices: [
+                    { text: '🤝 Be friends with the tadpole', next: 'friends', style: 'be-kind' },
+                    { text: '🏃 Go find his frog friends', next: 'alone', style: 'be-careful' }
+                ]
+            },
+            // Endings
+            investigate: {
+                scene: '🐟',
+                text: `Toby peeked through the reeds and saw... a friendly fish family!
+                They welcomed Toby and showed him their secret cave.
+                <br><br>
+                "It's okay to be curious," the fish family said.
+                "Just always be careful too."`,
+                ending: true,
+                lesson: "Being brave doesn't mean being reckless. Curiosity is great, but always check if it's safe first!"
+            },
+            safe: {
+                scene: '🏠',
+                text: `Toby swam back to his favorite lily pad. 
+                He was safe and sound.
+                <br><br>
+                "Maybe tomorrow I'll be brave enough to explore," Toby thought.`,
+                ending: true,
+                lesson: "It's okay to take your time. You don't have to do everything today. Patience is its own kind of bravery."
+            },
+            found: {
+                scene: '✨',
+                text: `Toby looked under the big lotus and found Grandpa's glasses!
+                Grandpa was so happy.
+                <br><br>
+                "Thank you, little Toby! You have kind eyes," Grandpa smiled.`,
+                ending: true,
+                lesson: "Being kind helps others — and it helps you too! Small acts of kindness make the pond a better place."
+            },
+            wrong: {
+                scene: '🔍',
+                text: `Toby searched near the log but couldn't find the glasses.
+                Then he remembered — maybe the lotus!
+                <br><br>
+                He looked under the flower and found them!`,
+                ending: true,
+                lesson: "Sometimes we don't find things right away. That's okay! Keep looking — patience helps us succeed."
+            },
+            friends: {
+                scene: '💚',
+                text: `Toby and the tadpole became best friends.
+                They played together every day.
+                <br><br>
+                "Thank you for being my friend," said the tadpole. 
+                "You showed me the pond isn't so scary after all."`,
+                ending: true,
+                lesson: "A kind word and a friendly smile can change someone's whole day. Be the friend you'd want to have!"
+            },
+            alone: {
+                scene: '😢',
+                text: `Toby went to find his friends, but the tadpole stayed alone.
+                Later, Toby felt sad. He should have stayed.
+                <br><br>
+                "I'll find him tomorrow," Toby promised.`,
+                ending: true,
+                lesson: "Sometimes we choose not to help, but it's never too late to make it right. Tomorrow is a new chance."
+            }
+        };
+
+        let currentStory = 'start';
+        let step = 1;
+
+        function updateDots() {
+            for (let i = 1; i <= 4; i++) {
+                const dot = document.getElementById('dot' + i);
+                if (i < step) {
+                    dot.className = 'dot done';
+                } else if (i === step) {
+                    dot.className = 'dot active';
+                } else {
+                    dot.className = 'dot';
+                }
+            }
+        }
+
+        function choose(nextKey) {
+            currentStory = nextKey;
+            step++;
+            updateDots();
+            render();
+        }
+
+        function render() {
+            const story = stories[currentStory];
+            const sceneEl = document.getElementById('scene-image');
+            const textEl = document.getElementById('story-text');
+            const choicesEl = document.getElementById('choices');
+            const lessonEl = document.getElementById('lesson');
+            const restartBtn = document.getElementById('restart-btn');
+
+            sceneEl.textContent = story.scene;
+            textEl.innerHTML = story.text;
+
+            if (story.ending) {
+                choicesEl.innerHTML = '';
+                lessonEl.style.display = 'block';
+                document.getElementById('lesson-text').textContent = story.lesson;
+                restartBtn.style.display = 'block';
+            } else {
+                choicesEl.innerHTML = story.choices.map((choice, i) => 
+                    `<button class="choice-btn ${choice.style}" onclick="choose('${choice.next}')">${choice.text}</button>`
+                ).join('');
+                lessonEl.style.display = 'none';
+                restartBtn.style.display = 'none';
+            }
+        }
+
+        function restart() {
+            currentStory = 'start';
+            step = 1;
+            updateDots();
+            render();
+        }
+
+        // Start
+        render();
+    </script>
+
+</body>
+</html>

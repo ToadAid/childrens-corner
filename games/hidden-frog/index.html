@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hidden Frogs | Tadpole Academy</title>
+    <style>
+        :root {
+            --water: #e0f7fa;
+            --deep-water: #006064;
+            --lily: #81c784;
+            --lotus: #f06292;
+            --toby: #29b6f6;
+            --sun: #ffd54f;
+            --font: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(180deg, #87ceeb 0%, #e0f7fa 50%, #81c784 100%);
+            font-family: var(--font);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--deep-water);
+            overflow-x: hidden;
+        }
+
+        h1 {
+            margin: 15px 10px 5px;
+            font-size: 1.8em;
+            text-shadow: 2px 2px 0 #fff;
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin: 10px 0;
+            font-size: 1.2em;
+            background: rgba(255,255,255,0.85);
+            padding: 10px 25px;
+            border-radius: 20px;
+        }
+
+        .stats span {
+            font-weight: bold;
+            color: #0277bd;
+        }
+
+        #scene {
+            position: relative;
+            width: 95%;
+            max-width: 450px;
+            height: 400px;
+            background: linear-gradient(180deg, #87ceeb 0%, #4fc3f7 40%, #29b6f6 70%, #81c784 100%);
+            border-radius: 20px;
+            border: 5px solid #0288d1;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin: 15px auto;
+            overflow: hidden;
+            cursor: crosshair;
+        }
+
+        /* Scene items */
+        .item {
+            position: absolute;
+            font-size: 28px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            user-select: none;
+        }
+
+        .item:hover {
+            transform: scale(1.1);
+        }
+
+        .item.found {
+            animation: foundAnim 0.5s;
+            filter: drop-shadow(0 0 10px gold);
+        }
+
+        @keyframes foundAnim {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.5); }
+        }
+
+        /* Distractor items */
+        .frog {
+            font-size: 24px;
+            opacity: 0.7;
+            filter: brightness(0.8) saturate(0.5);
+        }
+
+        /* Hidden frogs (harder to find) */
+        .hidden-frog {
+            font-size: 20px;
+            opacity: 0.5;
+            filter: brightness(0.6) saturate(0.3) blur(0.5px);
+        }
+
+        /* Decorations */
+        .lily-pad {
+            font-size: 35px;
+            z-index: 1;
+        }
+
+        .flower {
+            font-size: 22px;
+            z-index: 2;
+        }
+
+        .dragonfly {
+            font-size: 18px;
+            animation: buzz 0.3s infinite alternate;
+        }
+
+        @keyframes buzz {
+            from { transform: translateX(0) rotate(-5deg); }
+            to { transform: translateX(5px) rotate(5deg); }
+        }
+
+        .bird {
+            font-size: 28px;
+            animation: fly 8s infinite linear;
+        }
+
+        @keyframes fly {
+            0% { left: -30px; top: 20px; }
+            50% { left: 80%; top: 40px; }
+            100% { left: 110%; top: 20px; }
+        }
+
+        /* Click effect */
+        .click-effect {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: rgba(255, 215, 0, 0.5);
+            animation: ripple 0.5s ease-out;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        @keyframes ripple {
+            0% { transform: scale(0); opacity: 1; }
+            100% { transform: scale(3); opacity: 0; }
+        }
+
+        /* Win message */
+        #win-message {
+            display: none;
+            text-align: center;
+            margin: 20px;
+            padding: 25px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 25px;
+            animation: bounceIn 0.6s;
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        #win-message h2 {
+            color: #2e7d32;
+            margin: 0 0 10px;
+        }
+
+        .controls {
+            margin: 15px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        button {
+            padding: 12px 25px;
+            font-size: 1em;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: var(--font);
+            font-weight: bold;
+            transition: all 0.2s;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.15);
+        }
+
+        button:active { transform: translateY(4px); box-shadow: none; }
+
+        #btn-new { background: #b3e5fc; color: #0277bd; }
+        #btn-level { background: #fff9c4; color: #f57f17; }
+
+        .hint {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1>🐸 Find the Hidden Frogs!</h1>
+
+    <div class="stats">
+        <div>Found: <span id="found">0</span>/5</div>
+        <div>Clicks: <span id="clicks">0</span></div>
+    </div>
+
+    <div id="scene">
+        <!-- Decorative elements - Lily pads -->
+        <div class="item lily-pad" style="bottom: 10px; left: 20px;">🪷</div>
+        <div class="item lily-pad" style="bottom: 60px; right: 30px;">🪷</div>
+        <div class="item lily-pad" style="bottom: 120px; left: 50px;">🪷</div>
+        <div class="item lily-pad" style="bottom: 180px; right: 60px;">🪷</div>
+        
+        <!-- Flowers -->
+        <div class="item flower" style="bottom: 30px; right: 80px;">🌸</div>
+        <div class="item flower" style="bottom: 150px; left: 30px;">🌺</div>
+        
+        <!-- Dragonfly -->
+        <div class="item dragonfly" style="top: 60px; left: 100px;">🪰</div>
+        
+        <!-- Birds -->
+        <div class="item bird" style="animation-delay: 0s;">🐦</div>
+        <div class="item bird" style="animation-delay: 4s;">🐦</div>
+
+        <!-- Distractor frogs (not hidden ones) -->
+        <div class="item frog" style="bottom: 20px; left: 80px;" onclick="wrongClick()">🐸</div>
+        <div class="item frog" style="bottom: 100px; right: 40px;" onclick="wrongClick()">🐸</div>
+        <div class="item frog" style="top: 30px; left: 60px;" onclick="wrongClick()">🐸</div>
+
+        <!-- HIDDEN FROGS - The goal! -->
+        <div class="item hidden-frog" style="bottom: 45px; left: 140px;" data-found="false" onclick="foundFrog(this)">🐸</div>
+        <div class="item hidden-frog" style="bottom: 90px; left: 15px;" data-found="false" onclick="foundFrog(this)">🐸</div>
+        <div class="item hidden-frog" style="bottom: 200px; right: 20px;" data-found="false" onclick="foundFrog(this)">🐸</div>
+        <div class="item hidden-frog" style="top: 80px; right: 100px;" data-found="false" onclick="foundFrog(this)">🐸</div>
+        <div class="item hidden-frog" style="top: 25px; left: 150px;" data-found="false" onclick="foundFrog(this)">🐸</div>
+    </div>
+
+    <p class="hint">Hint: Look carefully — some frogs are hiding in the shadows! 👀</p>
+
+    <div id="win-message">
+        <h2>🎉 You Found Them All!</h2>
+        <p>Great eyes! You found all 5 hidden frogs!</p>
+        <p>The pond celebrates you! 🐸✨🌟</p>
+    </div>
+
+    <div class="controls">
+        <button id="btn-new" onclick="initGame()">🔄 New Game</button>
+    </div>
+
+    <script>
+        let found = 0;
+        let clicks = 0;
+        const totalFrogs = 5;
+
+        const foundDisplay = document.getElementById('found');
+        const clicksDisplay = document.getElementById('clicks');
+        const winMessage = document.getElementById('win-message');
+        const scene = document.getElementById('scene');
+
+        function initGame() {
+            found = 0;
+            clicks = 0;
+            foundDisplay.textContent = found;
+            clicksDisplay.textContent = clicks;
+            winMessage.style.display = 'none';
+
+            // Reset all frogs
+            document.querySelectorAll('.hidden-frog').forEach(frog => {
+                frog.style.display = 'block';
+                frog.dataset.found = 'false';
+                frog.classList.remove('found');
+            });
+
+            // Randomize positions slightly
+            const frogs = document.querySelectorAll('.hidden-frog');
+            const positions = [
+                { bottom: '45px', left: '140px' },
+                { bottom: '90px', left: '15px' },
+                { bottom: '200px', right: '20px' },
+                { top: '80px', right: '100px' },
+                { top: '25px', left: '150px' }
+            ];
+
+            frogs.forEach((frog, i) => {
+                const offset = (Math.random() - 0.5) * 30;
+                const pos = positions[i];
+                Object.keys(pos).forEach(key => {
+                    if (key.includes('left') || key.includes('right')) {
+                        frog.style[key] = `calc(${pos[key]} + ${offset}px)`;
+                    } else {
+                        frog.style[key] = `calc(${pos[key]} + ${offset}px)`;
+                    }
+                });
+            });
+        }
+
+        function foundFrog(element) {
+            if (element.dataset.found === 'true') return;
+            
+            element.dataset.found = 'true';
+            element.classList.add('found');
+            found++;
+            foundDisplay.textContent = found;
+
+            // Celebration effect
+            createCelebration(element);
+
+            if (found === totalFrogs) {
+                setTimeout(() => {
+                    winMessage.style.display = 'block';
+                }, 500);
+            }
+        }
+
+        function wrongClick() {
+            clicks++;
+            clicksDisplay.textContent = clicks;
+        }
+
+        // Click effect on scene
+        scene.addEventListener('click', function(e) {
+            if (e.target === scene || e.target.classList.contains('item')) {
+                const effect = document.createElement('div');
+                effect.className = 'click-effect';
+                effect.style.left = (e.clientX - scene.getBoundingClientRect().left - 15) + 'px';
+                effect.style.top = (e.clientY - scene.getBoundingClientRect().top - 15) + 'px';
+                scene.appendChild(effect);
+                setTimeout(() => effect.remove(), 500);
+            }
+        });
+
+        function createCelebration(element) {
+            const rect = element.getBoundingClientRect();
+            const sceneRect = scene.getBoundingClientRect();
+            
+            for (let i = 0; i < 8; i++) {
+                const star = document.createElement('div');
+                star.innerHTML = ['✨', '⭐', '🌟'][Math.floor(Math.random() * 3)];
+                star.style.position = 'absolute';
+                star.style.left = (rect.left - sceneRect.left + 10) + 'px';
+                star.style.top = (rect.top - sceneRect.top) + 'px';
+                star.style.fontSize = '20px';
+                star.style.pointerEvents = 'none';
+                star.style.animation = 'foundAnim 0.5s ease-out forwards';
+                star.style.zIndex = '50';
+                
+                const angle = (i / 8) * Math.PI * 2;
+                const distance = 30 + Math.random() * 20;
+                star.style.setProperty('--tx', Math.cos(angle) * distance + 'px');
+                star.style.setProperty('--ty', Math.sin(angle) * distance + 'px');
+                
+                scene.appendChild(star);
+                setTimeout(() => star.remove(), 500);
+            }
+        }
+
+        // Start game
+        initGame();
+    </script>
+
+</body>
+</html>

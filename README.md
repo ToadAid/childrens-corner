@@ -12,12 +12,14 @@ To create a gentle space where:
 ## 📚 What's Here
 
 ### 📖 Stories
+- **Story Builder** — A story where kids choose what happens next
 - Interactive tales of *Blue Toby's Journey*
 - Bedtime stories with deeper Lore lessons for parents
 
 ### 🎮 Games
 - **Memory Match** — Match pairs of Tobyworld symbols
 - **Blue Toby's First Leap** — Interactive hop-along adventure
+- **Hidden Frogs** — Find the hidden frogs in the pond
 - *(More coming soon!)*
 
 ---
@@ -48,11 +50,15 @@ childrens-corner/
 │   ├── blue-toby-first-leap/
 │   │   ├── index.html  # Interactive story
 │   │   └── README.md   # Story source
-│   └── blue-toby-wait/
-│       └── index.html  # "First Wait" interactive story
+│   ├── blue-toby-wait/
+│   │   └── index.html  # "First Wait" interactive story
+│   └── story-builder/
+│       └── index.html  # Choose-your-own-adventure
 └── games/
-    └── memory-match/
-        └── index.html   # Memory Match game
+    ├── memory-match/
+    │   └── index.html  # Card matching game
+    └── hidden-frog/
+        └── index.html   # Find hidden frogs game
 ```
 
 ---
